@@ -1,0 +1,545 @@
+{
+  "files": 2,
+  "loc": 147,
+  "seconds": 0.058,
+  "ms_per_kloc": 391.31,
+  "severity_breakdown": {
+    "critical": 9,
+    "high": 3,
+    "medium": 1,
+    "low": 1
+  },
+  "findings": [
+    {
+      "rule_id": "VS-CWE-89",
+      "cwe": "CWE-89",
+      "title": "SQL injection",
+      "file": "app.py",
+      "line": 27,
+      "col": 4,
+      "snippet": "cur.execute(f\"SELECT * FROM users WHERE name = '{name}'\")  # VULN: CWE-89",
+      "function": "user",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 25,
+          "kind": "source",
+          "detail": "user input request.args.get('name')"
+        },
+        {
+          "line": 25,
+          "kind": "propagate",
+          "detail": "assigned to 'name'"
+        },
+        {
+          "line": 27,
+          "kind": "propagate",
+          "detail": "f-string"
+        },
+        {
+          "line": 27,
+          "kind": "sink",
+          "detail": "SQL injection at cur.execute()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Use parameterized queries; never build SQL with f-strings, % or +.",
+        "secure_example": "cursor.execute(\"SELECT * FROM users WHERE name = %s\", (name,))",
+        "source_to_sink": "Untrusted data from line 25 (user input request.args.get('name')) reaches sql injection at line 27 through 2 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-78",
+      "cwe": "CWE-78",
+      "title": "OS command injection",
+      "file": "app.py",
+      "line": 50,
+      "col": 4,
+      "snippet": "os.system(\"ping -c 1 \" + host)  # VULN: CWE-78",
+      "function": "ping",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 49,
+          "kind": "source",
+          "detail": "user input request.args['host']"
+        },
+        {
+          "line": 49,
+          "kind": "propagate",
+          "detail": "assigned to 'host'"
+        },
+        {
+          "line": 50,
+          "kind": "propagate",
+          "detail": "string concatenation/formatting"
+        },
+        {
+          "line": 50,
+          "kind": "sink",
+          "detail": "OS command injection at os.system()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Avoid shell=True / os.system. Pass an argument list to subprocess.run and validate against an allow-list.",
+        "secure_example": "subprocess.run([\"ping\", \"-c\", \"1\", host], check=True)  # host validated with ipaddress.ip_address()",
+        "source_to_sink": "Untrusted data from line 49 (user input request.args['host']) reaches os command injection at line 50 through 2 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-78",
+      "cwe": "CWE-78",
+      "title": "OS command injection (shell=True)",
+      "file": "app.py",
+      "line": 65,
+      "col": 10,
+      "snippet": "out = subprocess.check_output(cmd, shell=True)  # VULN: CWE-78",
+      "function": "run",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 64,
+          "kind": "source",
+          "detail": "user input request.form.get('cmd')"
+        },
+        {
+          "line": 64,
+          "kind": "propagate",
+          "detail": "assigned to 'cmd'"
+        },
+        {
+          "line": 65,
+          "kind": "sink",
+          "detail": "OS command injection (shell=True) at subprocess.check_output()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Avoid shell=True / os.system. Pass an argument list to subprocess.run and validate against an allow-list.",
+        "secure_example": "subprocess.run([\"ping\", \"-c\", \"1\", host], check=True)  # host validated with ipaddress.ip_address()",
+        "source_to_sink": "Untrusted data from line 64 (user input request.form.get('cmd')) reaches os command injection (shell=true) at line 65 through 1 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/78.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-502",
+      "cwe": "CWE-502",
+      "title": "Insecure deserialization (pickle)",
+      "file": "app.py",
+      "line": 71,
+      "col": 10,
+      "snippet": "obj = pickle.loads(request.data)  # VULN: CWE-502",
+      "function": "load",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 71,
+          "kind": "source",
+          "detail": "user input request.data"
+        },
+        {
+          "line": 71,
+          "kind": "sink",
+          "detail": "Insecure deserialization (pickle) at pickle.loads()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Do not deserialize untrusted data with pickle/marshal; use JSON. For YAML use yaml.safe_load.",
+        "secure_example": "data = json.loads(payload)  # or yaml.safe_load(stream)",
+        "source_to_sink": "Untrusted data from line 71 (user input request.data) reaches insecure deserialization (pickle) at line 71 through 0 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/502.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-95",
+      "cwe": "CWE-95",
+      "title": "Code injection via eval",
+      "file": "app.py",
+      "line": 85,
+      "col": 15,
+      "snippet": "return str(eval(expr))  # VULN: CWE-95",
+      "function": "calc",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 84,
+          "kind": "source",
+          "detail": "user input request.args.get('e')"
+        },
+        {
+          "line": 84,
+          "kind": "propagate",
+          "detail": "assigned to 'expr'"
+        },
+        {
+          "line": 85,
+          "kind": "sink",
+          "detail": "Code injection via eval at eval()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Never eval/exec untrusted input. Use ast.literal_eval for literals or explicit parsing.",
+        "secure_example": "value = ast.literal_eval(user_text)",
+        "source_to_sink": "Untrusted data from line 84 (user input request.args.get('e')) reaches code injection via eval at line 85 through 1 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/95.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-89",
+      "cwe": "CWE-89",
+      "title": "SQL injection",
+      "file": "app.py",
+      "line": 111,
+      "col": 4,
+      "snippet": "get_db().execute(q)  # VULN: CWE-89",
+      "function": "run_query",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 116,
+          "kind": "source",
+          "detail": "user input request.args.get('v')"
+        },
+        {
+          "line": 116,
+          "kind": "propagate",
+          "detail": "assigned to 'v'"
+        },
+        {
+          "line": 117,
+          "kind": "call",
+          "detail": "passes through build_query()"
+        },
+        {
+          "line": 117,
+          "kind": "call",
+          "detail": "passed to run_query()"
+        },
+        {
+          "line": 111,
+          "kind": "sink",
+          "detail": "SQL injection"
+        },
+        {
+          "line": 111,
+          "kind": "sink",
+          "detail": "SQL injection at run_query()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 1.0413,
+      "remediation": {
+        "advice": "Use parameterized queries; never build SQL with f-strings, % or +.",
+        "secure_example": "cursor.execute(\"SELECT * FROM users WHERE name = %s\", (name,))",
+        "source_to_sink": "Untrusted data from line 116 (user input request.args.get('v')) reaches sql injection at line 111 through 3 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/89.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-22",
+      "cwe": "CWE-22",
+      "title": "Path traversal",
+      "file": "app.py",
+      "line": 91,
+      "col": 11,
+      "snippet": "return send_file(os.path.join(BASE, fname))  # VULN: CWE-22",
+      "function": "download",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 90,
+          "kind": "source",
+          "detail": "user input request.args.get('f')"
+        },
+        {
+          "line": 90,
+          "kind": "propagate",
+          "detail": "assigned to 'fname'"
+        },
+        {
+          "line": 91,
+          "kind": "propagate",
+          "detail": "via os.path.join()"
+        },
+        {
+          "line": 91,
+          "kind": "sink",
+          "detail": "Path traversal at send_file()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "high",
+      "cvss": 7.5,
+      "priority": 0.7969,
+      "remediation": {
+        "advice": "Normalize the path and verify it stays inside an allowed base directory; use secure_filename.",
+        "secure_example": "p = (BASE / secure_filename(name)).resolve()\nif not p.is_relative_to(BASE): abort(400)",
+        "source_to_sink": "Untrusted data from line 90 (user input request.args.get('f')) reaches path traversal at line 91 through 2 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-22",
+      "cwe": "CWE-22",
+      "title": "Path traversal",
+      "file": "app.py",
+      "line": 102,
+      "col": 9,
+      "snippet": "with open(os.path.join(BASE, name)) as fh:  # VULN: CWE-22",
+      "function": "files",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 101,
+          "kind": "source",
+          "detail": "route parameter 'name'"
+        },
+        {
+          "line": 102,
+          "kind": "propagate",
+          "detail": "via os.path.join()"
+        },
+        {
+          "line": 102,
+          "kind": "sink",
+          "detail": "Path traversal at open()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.85,
+      "severity": "high",
+      "cvss": 7.5,
+      "priority": 0.7969,
+      "remediation": {
+        "advice": "Normalize the path and verify it stays inside an allowed base directory; use secure_filename.",
+        "secure_example": "p = (BASE / secure_filename(name)).resolve()\nif not p.is_relative_to(BASE): abort(400)",
+        "source_to_sink": "Untrusted data from line 101 (route parameter 'name') reaches path traversal at line 102 through 1 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/22.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-798",
+      "cwe": "CWE-798",
+      "title": "Hardcoded credential in 'DB_PASSWORD'",
+      "file": "app.py",
+      "line": 13,
+      "col": 0,
+      "snippet": "DB_PASSWORD = \"Sup3rS3cret!\"  # VULN: CWE-798",
+      "function": null,
+      "tainted": false,
+      "trace": [
+        {
+          "line": 13,
+          "kind": "sink",
+          "detail": "Hardcoded credential in 'DB_PASSWORD'"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.7,
+      "severity": "critical",
+      "cvss": 9.1,
+      "priority": 0.637,
+      "remediation": {
+        "advice": "Load secrets from environment variables or a secret manager (e.g. Azure Key Vault); rotate the exposed secret.",
+        "secure_example": "password = os.environ[\"DB_PASSWORD\"]",
+        "source_to_sink": null,
+        "reference": "https://cwe.mitre.org/data/definitions/798.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-502",
+      "cwe": "CWE-502",
+      "title": "Insecure deserialization (yaml.load without SafeLoader)",
+      "file": "app.py",
+      "line": 77,
+      "col": 10,
+      "snippet": "cfg = yaml.load(request.data)  # VULN: CWE-502",
+      "function": "config",
+      "tainted": true,
+      "trace": [
+        {
+          "line": 77,
+          "kind": "source",
+          "detail": "user input request.data"
+        },
+        {
+          "line": 77,
+          "kind": "sink",
+          "detail": "Insecure deserialization (yaml.load without SafeLoader) at yaml.load()"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.5,
+      "severity": "critical",
+      "cvss": 9.8,
+      "priority": 0.6125,
+      "remediation": {
+        "advice": "Do not deserialize untrusted data with pickle/marshal; use JSON. For YAML use yaml.safe_load.",
+        "secure_example": "data = json.loads(payload)  # or yaml.safe_load(stream)",
+        "source_to_sink": "Untrusted data from line 77 (user input request.data) reaches insecure deserialization (yaml.load without safeloader) at line 77 through 0 step(s) without sanitization.",
+        "reference": "https://cwe.mitre.org/data/definitions/502.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-295",
+      "cwe": "CWE-295",
+      "title": "TLS certificate verification disabled",
+      "file": "utils.py",
+      "line": 6,
+      "col": 11,
+      "snippet": "return requests.get(url, verify=False)  # VULN: CWE-295",
+      "function": null,
+      "tainted": false,
+      "trace": [
+        {
+          "line": 6,
+          "kind": "sink",
+          "detail": "TLS certificate verification disabled"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.8,
+      "severity": "high",
+      "cvss": 7.4,
+      "priority": 0.592,
+      "remediation": {
+        "advice": "Keep TLS verification enabled; supply a CA bundle if needed.",
+        "secure_example": "requests.get(url, verify=\"/path/ca.pem\")",
+        "source_to_sink": null,
+        "reference": "https://cwe.mitre.org/data/definitions/295.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-798",
+      "cwe": "CWE-798",
+      "title": "Hardcoded credential in key 'password'",
+      "file": "utils.py",
+      "line": 14,
+      "col": 41,
+      "snippet": "return {\"user\": \"admin\", \"password\": \"P@ssw0rd123\"}  # VULN: CWE-798",
+      "function": null,
+      "tainted": false,
+      "trace": [
+        {
+          "line": 14,
+          "kind": "sink",
+          "detail": "Hardcoded credential in key 'password'"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.6,
+      "severity": "critical",
+      "cvss": 9.1,
+      "priority": 0.546,
+      "remediation": {
+        "advice": "Load secrets from environment variables or a secret manager (e.g. Azure Key Vault); rotate the exposed secret.",
+        "secure_example": "password = os.environ[\"DB_PASSWORD\"]",
+        "source_to_sink": null,
+        "reference": "https://cwe.mitre.org/data/definitions/798.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-489",
+      "cwe": "CWE-489",
+      "title": "Debug mode enabled in web application",
+      "file": "app.py",
+      "line": 127,
+      "col": 4,
+      "snippet": "app.run(debug=True)  # VULN: CWE-489",
+      "function": null,
+      "tainted": false,
+      "trace": [
+        {
+          "line": 127,
+          "kind": "sink",
+          "detail": "Debug mode enabled in web application"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.6,
+      "severity": "medium",
+      "cvss": 5.3,
+      "priority": 0.318,
+      "remediation": {
+        "advice": "Disable debug mode in production; drive it from configuration.",
+        "secure_example": "app.run(debug=os.getenv(\"FLASK_DEBUG\") == \"1\")",
+        "source_to_sink": null,
+        "reference": "https://cwe.mitre.org/data/definitions/489.html"
+      },
+      "triage_prob": null
+    },
+    {
+      "rule_id": "VS-CWE-327",
+      "cwe": "CWE-327",
+      "title": "Weak hash algorithm hashlib.md5",
+      "file": "utils.py",
+      "line": 10,
+      "col": 11,
+      "snippet": "return hashlib.md5(data).hexdigest()  # VULN: CWE-327",
+      "function": null,
+      "tainted": false,
+      "trace": [
+        {
+          "line": 10,
+          "kind": "sink",
+          "detail": "Weak hash algorithm hashlib.md5"
+        }
+      ],
+      "engine": "vulnscope",
+      "confidence": 0.4,
+      "severity": "low",
+      "cvss": 3.7,
+      "priority": 0.148,
+      "remediation": {
+        "advice": "Use SHA-256+ for integrity and bcrypt/argon2/scrypt for passwords.",
+        "secure_example": "hashlib.sha256(data).hexdigest()",
+        "source_to_sink": null,
+        "reference": "https://cwe.mitre.org/data/definitions/327.html"
+      },
+      "triage_prob": null
+    }
+  ],
+  "errors": []
+}
