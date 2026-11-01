@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-11-01T05:11:14.118963+00:00",
+  "sample": {
+    "md5": "ff7cbc178c1865d1738db02411802507",
+    "sha1": "113fa83b90c3792d015a7fcdc9bb88f9ef31d355",
+    "sha256": "c0be15d83247498e82b93256df59de9331d3c19e999f8096cee78df2ab65978a",
+    "size": 1536
+  },
+  "verdict": "critical",
+  "risk_score": 0.9494,
+  "risk_components": {
+    "yara": 0.9,
+    "behavior": 0.9987
+  },
+  "static": {
+    "is_pe": true,
+    "error": null,
+    "machine": "IMAGE_FILE_MACHINE_I386",
+    "timestamp": 1593835520,
+    "is_dll": false,
+    "num_sections": 2,
+    "entry_point": 4096,
+    "sections": [
+      {
+        "name": ".text",
+        "virtual_size": 512,
+        "raw_size": 512,
+        "entropy": 7.4798,
+        "executable": true,
+        "writable": true
+      },
+      {
+        "name": ".idata",
+        "virtual_size": 512,
+        "raw_size": 512,
+        "entropy": 2.7683,
+        "executable": false,
+        "writable": true
+      }
+    ],
+    "imports": {
+      "kernel32.dll": [
+        "VirtualAllocEx",
+        "WriteProcessMemory",
+        "CreateRemoteThread",
+        "OpenProcess",
+        "IsDebuggerPresent",
+        "LoadLibraryA",
+        "GetProcAddress"
+      ],
+      "advapi32.dll": [
+        "RegSetValueExA"
+      ]
+    },
+    "exports": [],
+    "suspicious_apis": {
+      "process_injection": [
+        "CreateRemoteThread",
+        "VirtualAllocEx",
+        "WriteProcessMemory"
+      ],
+      "anti_analysis": [
+        "IsDebuggerPresent"
+      ],
+      "persistence": [
+        "RegSetValueExA"
+      ],
+      "dynamic_loading": [
+        "GetProcAddress",
+        "LoadLibraryA"
+      ]
+    },
+    "anomalies": [
+      "high_entropy_section:.text",
+      "rwx_section:.text"
+    ],
+    "overall_entropy": 4.624308591228093
+  },
+  "yara": [
+    {
+      "rule": "Suspicious_Process_Injection_APIs",
+      "tags": [
+        "injection"
+      ],
+      "severity": "high",
+      "description": "Imports commonly used together for remote process injection"
+    }
+  ],
+  "behavior": {
+    "signals": {
+      "lolbin_execution": [
+        "vssadmin.exe",
+        "powershell.exe"
+      ],
+      "shadow_copy_deletion": [
+        "vssadmin.exe Delete Shadows /All /Quiet"
+      ],
+      "encoded_powershell": [
+        "powershell -nop -enc SQBFAFgA"
+      ],
+      "registry_persistence": [
+        "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\updater"
+      ],
+      "encrypted_extension_writes": [
+        "C:\\Users\\a\\doc1.docx.locked"
+      ],
+      "network_activity": [
+        "1 domains, 1 hosts"
+      ]
+    }
+  },
+  "explanation": null,
+  "iocs": {
+    "urls": [
+      "http://update-check.example-c2.net/gate.php"
+    ],
+    "ips": [],
+    "domains": [
+      "gate.php",
+      "update-check.example-c2.net"
+    ],
+    "sha256": [],
+    "sha1": [],
+    "md5": []
+  }
+}

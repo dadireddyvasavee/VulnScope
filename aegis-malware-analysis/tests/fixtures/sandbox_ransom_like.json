@@ -1,0 +1,20 @@
+{
+  "info": {"note": "SYNTHETIC report for tests - not from a real sample"},
+  "behavior": {
+    "processes": [
+      {"process_name": "sample.exe", "command_line": "sample.exe"},
+      {"process_name": "vssadmin.exe", "command_line": "vssadmin.exe Delete Shadows /All /Quiet"},
+      {"process_name": "powershell.exe", "command_line": "powershell -nop -enc SQBFAFgA"}
+    ],
+    "summary": {
+      "write_files": ["C:\\Users\\a\\doc1.docx.locked", "C:\\Users\\a\\README_DECRYPT.txt"],
+      "delete_files": ["C:\\Users\\a\\doc1.docx"],
+      "write_keys": ["HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\updater"]
+    }
+  },
+  "network": {
+    "domains": [{"domain": "update-check.example-c2.net"}],
+    "hosts": [{"ip": "203.0.113.45"}],
+    "http": [{"uri": "http://update-check.example-c2.net/gate.php"}]
+  }
+}

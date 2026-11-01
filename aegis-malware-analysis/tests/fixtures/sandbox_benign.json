@@ -1,0 +1,2 @@
+{"behavior": {"processes": [{"process_name": "notepad.exe", "command_line": "notepad.exe"}],
+  "summary": {"write_files": [], "delete_files": [], "write_keys": []}}, "network": {}}

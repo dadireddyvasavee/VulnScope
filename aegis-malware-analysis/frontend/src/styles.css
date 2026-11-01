@@ -1,0 +1,12 @@
+body { font-family: Segoe UI, system-ui, sans-serif; background: #f4f6f8; margin: 0; color: #1b1b1b; }
+main { max-width: 1000px; margin: 0 auto; padding: 24px; }
+h1 small { font-weight: 400; color: #666; font-size: 0.5em; }
+.card { background: #fff; border-radius: 8px; padding: 16px 20px; margin: 16px 0; box-shadow: 0 1px 3px #0002; }
+form label { display: block; margin: 8px 0; }
+button { background: #0078d4; color: #fff; border: 0; padding: 8px 18px; border-radius: 4px; cursor: pointer; }
+button:disabled { background: #999; }
+.badge { color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.75em; text-transform: uppercase; }
+.mono { font-family: Consolas, monospace; font-size: 0.85em; }
+table { width: 100%; border-collapse: collapse; } td, th { border-bottom: 1px solid #eee; padding: 6px; text-align: left; }
+tbody tr:hover { background: #f0f6ff; cursor: pointer; }
+.warn { color: #8a6d00; } .err { color: #b00020; }
